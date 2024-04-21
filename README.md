@@ -273,7 +273,7 @@ To run each application, you need to run the executable on each server through t
     # Replace the server_id with the index for the server that is executing this executable. The main server should have 0 as its index. Suppose you have 8 servers, then the last server's index is 7.
     # Replace the app_name with the name for the application you want to run. The example applications' names are dataframe, gemm, kv, sn.
     # For example, ./../target/release/drust -s 7 -a dataframe
-    ./../target/release/drust -s server_id -a app_name
+    ./../drust.out -s server_id -a app_name
     ```
 
 2. After starting the executable on all other servers, wait for 2 seconds, and then on your main server, run:
@@ -282,7 +282,7 @@ To run each application, you need to run the executable on each server through t
     cd ~/DRust_home/DRust/drust
 
     # Replace the app_name with the dataframe, gemm, kv, or sn.
-    ./../target/release/drust -s 0 -a app_name
+    ./../drust.out -s 0 -a app_name
     ```
 
 ## 4. Code structure
