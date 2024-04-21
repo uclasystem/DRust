@@ -1,0 +1,50 @@
+[package]
+name = "drust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+cc = "1.0"
+
+
+
+[dependencies]
+good_memory_allocator = {version = "0.1.7", features = ["allocator"]}
+anyhow = "1.0"
+clap = { version = "4.3.0", features = ["derive"] }
+log = "0.4"
+futures = "0.3"
+rand = "0.8"
+tarpc = { version = "0.33", features = ["full"] }
+tokio = { version = "1.33.0", features = ["macros", "net", "rt-multi-thread"] }
+serde = "1.0.160"
+itertools = "0.10.5"
+bytes = "1.4.0"
+serde_json = "1.0.96"
+fastrand = "1.9.0"
+thiserror = "^1.0.16"
+num = "0.4.0"
+fnv = "^1.0.7"
+unsafe_unwrap = "^0.1.0"
+rayon = "^1.3.1"
+prettytable-rs = { version="0.10.0", features=["win_crlf"], optional = true, default_features = false}
+crossbeam = "0.8.2"
+chrono = {version = "^0.4.13", optional = true}
+enum_dispatch = "^0.3.2"
+bitmaps = "3.2.0"
+bytemuck = "1.13.1"
+bitset-core = "0.1.1"
+csv = "1.1"
+crossbeam-queue = "0.3.8"
+dashmap = { version = "5.4.0", features = ["rayon"] }
+arr_macro = "0.2.1"
+rusttype = "0.9.3"
+ffmpeg-next = "6.0.0"
+imageproc = "0.23.0"
+image = "0.24.7"
+dirs = "5.0"
+
+[target.'cfg(not(target_env = "msvc"))'.dependencies]
+jemallocator = "0.5.4"

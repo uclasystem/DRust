@@ -1,0 +1,16 @@
+[package]
+name = "gemm"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[build-dependencies]
+cc = "1.0"
+
+
+[dependencies]
+tarpc = { version = "0.33", features = ["full"] }
+tokio = { version = "1.33.0", features = ["macros", "net", "rt-multi-thread"] }
+num = "0.4.0"
+good_memory_allocator = {version = "0.1.7", features = ["allocator"]}
+dirs = "5.0"
