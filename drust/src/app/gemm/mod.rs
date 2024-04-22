@@ -39,7 +39,7 @@ pub async fn run() {
         duration
     );
     let file_name = format!(
-        "{}/DRust_home/logs/gemm_{}.txt", dirs::home_dir().unwrap().display(), NUM_SERVERS
+        "{}/DRust_home/logs/gemm_drust_{}.txt", dirs::home_dir().unwrap().display(), NUM_SERVERS
     );
     let mut wrt_file = File::create(file_name).expect("file");
     let milli_seconds = duration.as_millis();
