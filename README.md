@@ -143,7 +143,7 @@ rustup default nightly-2023-04-25
 
 ### 1.4 Disable ASLR
 
-To facilitate remote thread spawning, we require users to disable ASLR on each server:
+To facilitate remote thread spawning, we require users to disable ASLR on each server. The following command should be executed every time the server is restarted.
 
 ```bash
 echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
@@ -168,6 +168,7 @@ Create a folder with name `dataset` in `DRust_home`. Download datasets and extra
 cd ~/DRust_home
 mkdir dataset
 cd dataset
+# Put the dataset here
 ```
 
 ### 2.2 Configuration
@@ -231,10 +232,10 @@ cd ~/DRust_home/DRust/drust
 Note that you may encounter the following error:
 
 ```bash
-error: package `clap_lex v0.7.0` cannot be built because it requires rustc 1.74 or newer, while the currently active rustc version is 1.71.0-nightly
+error: package `clap v4.5.4` cannot be built because it requires rustc 1.74 or newer, while the currently active rustc version is 1.71.0-nightly
 Either upgrade to rustc 1.74 or newer, or use
-cargo update -p clap_lex@0.7.0 --precise ver
-where `ver` is the latest version of `clap_lex` supporting rustc 1.71.0-nightly
+cargo update -p clap@4.5.4 --precise ver
+where `ver` is the latest version of `clap` supporting rustc 1.71.0-nightly
 ```
 
 Please run the following command and then run building process again:
