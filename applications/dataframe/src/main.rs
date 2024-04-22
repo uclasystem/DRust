@@ -35,9 +35,6 @@ pub const DATASET_ID: usize = 2;
 pub const DATASET_NAME: &str = "G1_1e8_1e2_0_0.csv";
 
 pub async fn run() {
-    unsafe{
-        COMPUTES = Some(ResourceManager::new(1));
-    }
     match DATASET_ID {
         0 => h2oai_groupby_benchmark(DSize::Small).await,
         1 => h2oai_groupby_benchmark(DSize::Medium).await,

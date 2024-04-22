@@ -2,7 +2,9 @@
 
 To facilitate the robustness and the maintainance, DRust is provided as a special library and framework to help prorammers easily distribute their own application onto multiple servers with consistency and ultra efficiency. 
 
-DRust provided four example applications to show the ability and potential of DRust. To deploy your own application on DRust, you need to add your application code into `drust/src/app` and rename your `main` function to `run`. Besides, some of the basic language constructs in your code need to be renamed as DRust version (e.g. Box to DBox, Vec to DVec). This should be a easy process and a tool to facilitate this process will be provided.
+DRust provided four example applications to show the ability and potential of DRust. To deploy your own application on DRust, you need to add your application code into `drust/src/app` and rename your `main` function to `run`. Besides, some of the basic language constructs in your code need to be renamed as DRust version (e.g. Box to DBox, Vec to DVec). This should be a easy process and a tool to facilitate this process will be provided. 
+
+Note that one limitation of DRust is that DRust currently only supports spawning an async closure(thread) remotely. So programmers' application need to conform to this requirement to be integrated with DRust.
 
 The following are the detailed documentations for different language constructs in DRust:
 

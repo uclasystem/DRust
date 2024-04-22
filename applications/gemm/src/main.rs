@@ -5,7 +5,7 @@ pub mod par_strassen;
 pub mod single_strassen;
 pub mod utils;
 
-use std::time::Instant;
+use std::{fs::File, time::Instant, io::Write};
 use tokio::runtime::Runtime;
 
 use conf::*;
@@ -34,9 +34,15 @@ pub async fn run() {
         "Time elapsed in matrix multiplication function() is: {:?}",
         duration
     );
-    for i in (MATRIX_SIZE - 16)..MATRIX_SIZE {
-        for j in (MATRIX_SIZE - 16)..MATRIX_SIZE {
-            println!("matrix_c[{}, {}] = {}", i, j, matrix_c[i * 16 + j]);
+    let file_name = format!(
+        "{}/DRust_home/logs/gemm_single.txt", dirs::home_dir().unwrap().display()
+    );
+    let mut wrt_file = File::create(file_name).expect("file");
+    let milli_seconds = duration.as_millis();
+    writeln!(wrt_file, "{}", milli_seconds as f64 / 1000.0).expect("write");
+    for i in (MATRIX_SIZE - 8)..MATRIX_SIZE {
+        for j in (MATRIX_SIZE - 8)..MATRIX_SIZE {
+            println!("matrix_c[{}, {}] = {}", i, j, matrix_c[i * MATRIX_SIZE + j]);
         }
     }
 }

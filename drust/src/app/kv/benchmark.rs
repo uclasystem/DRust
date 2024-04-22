@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{fs::File, sync::Arc, io::Write};
 
 use rand::{
     distributions::{Distribution, Uniform},
@@ -158,4 +158,11 @@ pub async fn zipf_bench() {
     let time = start.elapsed();
     println!("Total Elapsed Time: {:?}", time);
     println!("Total Throughput: {:?}", 100000000 as f64 / time.as_secs_f64());   
+    
+    let file_name = format!(
+        "{}/DRust_home/logs/kv_drust_{}.txt", dirs::home_dir().unwrap().display(), NUM_SERVERS
+    );
+    let mut wrt_file = File::create(file_name).expect("file");
+    let milli_seconds = time.as_millis();
+    writeln!(wrt_file, "{}", milli_seconds as f64 / 1000.0).expect("write");
 }

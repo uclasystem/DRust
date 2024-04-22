@@ -2,6 +2,9 @@
 
 This repository contains a research artifact which is an easy-to-use, efficient, and consistent distributed shared memory library. With DRust-DSM you can easily distribute your single machine application to multiple servers with great performance.
 
+**Please see [ae.md](./docs/osdi24ae-77.md) for instructions to run our tool on provided servers.**
+
+
 ## 1. Environment Setup
 
 ### 1.1 Prerequisites
@@ -149,7 +152,7 @@ To facilitate remote thread spawning, we require users to disable ASLR on each s
 echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 ```
 
-## 2 Download and Install DRust
+## 2. Download and Install DRust
 
 On all your servers' home directory, create a folder called `DRust_home`, and then download DRust into that directory:
 

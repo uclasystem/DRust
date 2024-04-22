@@ -5,7 +5,7 @@ use enum_dispatch::enum_dispatch;
 use num::{ Num, NumCast };
 use rayon::prelude::*;
 use std::{ borrow::Borrow, collections::HashMap, hash::Hash, sync::{atomic::{AtomicUsize, Ordering}, Arc}, time::{ Duration, SystemTime } };
-use crate::{app::dataframe::{GLOBAL_HEAP_START, WORKER_UNIT_SIZE}, dprintln, drust_std::{alloc::LOCAL_ALLOCATOR, collections::dvec::{DVec, DVecRef}, thread::{dscope_spawn, dspawn, dspawn_to}}};
+use crate::{conf::*, dprintln, drust_std::{alloc::LOCAL_ALLOCATOR, collections::dvec::{DVec, DVecRef}, thread::{dscope_spawn, dspawn, dspawn_to}}};
 
 use self::utils::to_chunked_index;
 

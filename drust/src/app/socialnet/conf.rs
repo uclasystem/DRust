@@ -5,5 +5,5 @@ pub const FRAME_NUM: usize = 5;
 pub const VIDEO_PATH: &str = "DRust_home/dataset/media.mp4";
 pub const UNIQUE_ID_SERVER_ID: usize = 0;
 pub const THREAD_NUM: usize = 64;
-pub const VIDEO_STORAGE_SERVER_NUM: usize = 2;
-pub const VIDEO_STORAGE_SERVER_START: usize = 2;
+pub const VIDEO_STORAGE_SERVER_NUM: usize = 1;
+pub const VIDEO_STORAGE_SERVER_START: usize = 0;

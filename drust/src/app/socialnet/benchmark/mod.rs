@@ -1,4 +1,4 @@
-use std::{cmp, sync::Arc, time::SystemTime};
+use std::{cmp, fs::File, io::Write, sync::Arc, time::SystemTime};
 
 use arr_macro::arr;
 use super::{conf::*, media::utils::decode_and_extract};
@@ -41,5 +41,12 @@ pub async fn socialnet_benchmark() {
   }
   let time = start.elapsed().unwrap();
   println!("Elapsed Time: {:?}", time);
+  
+  let file_name = format!(
+    "{}/DRust_home/logs/sn_drust_{}.txt", dirs::home_dir().unwrap().display(), NUM_SERVERS
+  );
+  let mut wrt_file = File::create(file_name).expect("file");
+  let milli_seconds = time.as_millis();
+  writeln!(wrt_file, "{}", milli_seconds as f64 / 1000.0).expect("write");
   
 }

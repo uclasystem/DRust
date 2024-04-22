@@ -1,11 +1,7 @@
 use futures::{future, prelude::*};
 use serde::{Deserialize, Serialize};
 use std::{
-    fs::File,
-    io::{self, Write},
-    net::SocketAddr,
-    sync::Arc,
-    time::{Duration, SystemTime},
+    cmp, fs::File, io::{self, Write}, net::SocketAddr, sync::Arc, time::{Duration, SystemTime}
 };
 use tokio::{
     runtime::Runtime,
@@ -16,7 +12,8 @@ use super::super::{frame, prelude::DataType};
 use super::super::prelude::*;
 use super::utils::*;
 
-use crate::conf::NUM_SERVERS;
+use crate::drust_std::utils::*;
+use crate::conf::*;
 
 async fn groupby_work(
     x: &DataFrame,
@@ -66,6 +63,10 @@ async fn groupby_work(
 }
 
 pub async fn h2oai_groupby_benchmark(dataset_size: DSize) {
+    unsafe{
+        COMPUTES = Some(ResourceManager::new(NUM_SERVERS));
+    }
+
     let (f, line_cnt) = match dataset_size {
         DSize::Small => ("group.csv", 10),
         DSize::Medium => ("G1_1e7_1e2_0_0.csv", 10000000),
@@ -94,8 +95,7 @@ pub async fn h2oai_groupby_benchmark(dataset_size: DSize) {
     print(&mut x).await;
 
     let file_name = format!(
-        "{}/DRust_home/logs/drust_groupby_{:?}_{}.txt", dirs::home_dir().unwrap().display(),
-        dataset_size, NUM_SERVERS
+        "{}/DRust_home/logs/dataframe_drust_{}.txt", dirs::home_dir().unwrap().display(), NUM_SERVERS
     );
     let mut wrt_file = File::create(file_name).expect("file");
 
@@ -429,4 +429,5 @@ pub async fn h2oai_groupby_benchmark(dataset_size: DSize) {
     }
 
     println!("query {:?}, {}ms", dataset_size, duration);
+    writeln!(wrt_file, "{}", duration as f64 / 1000.0).expect("write");
 }

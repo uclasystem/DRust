@@ -3,22 +3,10 @@ pub mod par_strassen;
 pub mod single_strassen;
 pub mod utils;
 
-use std::sync::Arc;
-use tarpc::{
-    context,
-    server,
-    server::{incoming::Incoming, Channel },
-    tokio_serde::formats::Json,
-    client::{self, Config},
-};
-use std::time::Duration;
-use std::{net::SocketAddr, time::Instant};
-use futures::{future, prelude::*};
-use tokio::runtime::Runtime;
+use std::{fs::File, time::Instant, io::Write};
 
 use conf::*;
 use par_strassen::*;
-use tokio::time::sleep;
 use utils::*;
 
 
@@ -50,9 +38,15 @@ pub async fn run() {
         "Time elapsed in matrix multiplication function() is: {:?}",
         duration
     );
+    let file_name = format!(
+        "{}/DRust_home/logs/gemm_{}.txt", dirs::home_dir().unwrap().display(), NUM_SERVERS
+    );
+    let mut wrt_file = File::create(file_name).expect("file");
+    let milli_seconds = duration.as_millis();
+    writeln!(wrt_file, "{}", milli_seconds as f64 / 1000.0).expect("write");
     for i in (MATRIX_SIZE - 16)..MATRIX_SIZE {
         for j in (MATRIX_SIZE - 16)..MATRIX_SIZE {
-            println!("matrix_c[{}, {}] = {}", i, j, matrix_c[i * 16 + j]);
+            println!("matrix_c[{}, {}] = {}", i, j, matrix_c[i * MATRIX_SIZE + j]);
         }
     }
 }

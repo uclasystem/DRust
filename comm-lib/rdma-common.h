@@ -24,7 +24,7 @@
     if (!(x))                                            \
       die("error: " #x " failed (returned zero/null)."); \
   } while (0)
-#define TOTAL_NUM_SERVERS 8
+#define TOTAL_NUM_SERVERS 2
 #define NUM_SERVERS (TOTAL_NUM_SERVERS - 1)
 #define THREAD_FLAG_NUM (1024 * 1024)
 

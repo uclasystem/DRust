@@ -93,8 +93,7 @@ pub async fn h2oai_groupby_benchmark(dataset_size: DSize) {
     print(&mut x).await;
 
     let file_name = format!(
-        "{}/DRust_home/logs/drust_groupby_{:?}_{}.txt", dirs::home_dir().unwrap().display() ,
-        dataset_size, "single_server"
+        "{}/DRust_home/logs/dataframe_single.txt", dirs::home_dir().unwrap().display()
     );
     let mut wrt_file = File::create(file_name).expect("file");
 
@@ -427,5 +426,6 @@ pub async fn h2oai_groupby_benchmark(dataset_size: DSize) {
         print(&mut frame).await;
     }
 
-    println!("query {:?}, {}ms", dataset_size, duration);
+    println!("query {:?}, {} s", dataset_size, duration as f64 / 1000.0);
+    writeln!(wrt_file, "{}", duration as f64 / 1000.0).expect("write");
 }
