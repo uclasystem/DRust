@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+  "applications/gemm",
+  "applications/dataframe",
+  "applications/kv",
+  "drust",
+]

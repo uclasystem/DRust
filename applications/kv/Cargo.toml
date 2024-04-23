@@ -1,0 +1,14 @@
+[package]
+name = "kv"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tarpc = { version = "0.33", features = ["full"] }
+tokio = { version = "1.33.0", features = ["macros", "net", "rt-multi-thread"] }
+num = "0.4.0"
+good_memory_allocator = {version = "0.1.7", features = ["allocator"]}
+dirs = "5.0"
+dashmap = { version = "5.4.0", features = ["rayon"] }
+rand = "0.8"
+csv = "1.1"

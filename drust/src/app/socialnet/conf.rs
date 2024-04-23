@@ -1,0 +1,9 @@
+pub const FRAME_HEIGHT: u32 = 270;
+pub const FRAME_WIDTH: u32 = 480;
+pub const FRAME_SIZE: usize = FRAME_HEIGHT as usize * FRAME_WIDTH as usize * 3;
+pub const FRAME_NUM: usize = 5;
+pub const VIDEO_PATH: &str = "DRust_home/dataset/media.mp4";
+pub const UNIQUE_ID_SERVER_ID: usize = 0;
+pub const THREAD_NUM: usize = 64;
+pub const VIDEO_STORAGE_SERVER_NUM: usize = 1;
+pub const VIDEO_STORAGE_SERVER_START: usize = 0;
