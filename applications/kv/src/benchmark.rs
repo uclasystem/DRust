@@ -1,19 +1,18 @@
-use std::{fs::File, sync::Arc, io::Write};
+use std::{fs::File, io::Write, sync::Arc, thread};
 
 use rand::{
     distributions::{Distribution, Uniform}, rngs::StdRng, thread_rng, SeedableRng
 };
-use tokio::{runtime::Runtime, task::JoinHandle};
+use tokio::{runtime::Runtime, sync::Mutex, task::JoinHandle};
+
+use crate::conf::*;
 
 use super::{dmap::KVStore, dmap::*, entry::GlobalEntry, conf::{bucket, READ_RATIO, UNIT_BUCKET_NUM, UNIT_THREAD_BUCKET_NUM, THREAD_NUM}};
 
 
-use crate::{conf::{GLOBAL_HEAP_START, NUM_SERVERS, SERVER_INDEX, WORKER_UNIT_SIZE}, drust_std::{collections::dvec::DVecRef, sync::dmutex::DMutex, thread::dspawn_to}};
-
-
 static mut KEYS: Option<Vec<Vec<(usize, i32)>>> = None;
 
-pub async fn populate(map: DVecRef<'_, DMutex<GlobalEntry>>) {
+pub async fn populate(map: &Vec<Mutex<GlobalEntry>>) {
     let v = ['x' as u8; 32];
     let csv_file = format!("{}/DRust_home/dataset/dht/zipf/gam_data_0.99_100000000_{}_{}.csv", dirs::home_dir().unwrap().display(), NUM_SERVERS, unsafe{SERVER_INDEX % NUM_SERVERS});
     let mut rdr = csv::Reader::from_path(csv_file).unwrap();
@@ -52,7 +51,7 @@ pub async fn populate(map: DVecRef<'_, DMutex<GlobalEntry>>) {
     // unsafe{KEYS = Some(keys_vec);}
 }
 
-pub async fn benchmark(map: DVecRef<'_, DMutex<GlobalEntry>>) {
+pub async fn benchmark(map: &Vec<Mutex<GlobalEntry>>) {
     let mut cnt = 0;
     let v = ['x' as u8; 32];
     let start = tokio::time::Instant::now();
@@ -87,39 +86,38 @@ pub async fn zipf_bench() {
     let map = KVStore::new();
 
     let popstart = tokio::time::Instant::now();
-    let mut handles = vec![];
-    for i in 0..NUM_SERVERS {
-        let map_ref = map.as_dref();
-        let handle: JoinHandle<()> = dspawn_to(populate(map_ref), GLOBAL_HEAP_START + i * WORKER_UNIT_SIZE);
-        handles.push(handle);
-    }
-    for handle in handles {
-        handle.await;
-    }
-    println!("Populate Elapsed Time: {:?}", popstart.elapsed());
-    
+    thread::scope(|s| {
+        let mut handles = vec![];
+        for i in 0..NUM_SERVERS {
+            let map_ref = map.as_ref();
+            let handle = s.spawn(|| Runtime::new().unwrap().block_on(populate(map_ref)));
+            handles.push(handle);
+        }
+        for handle in handles {
+            handle.join().unwrap();
+        }
+        println!("Populate Elapsed Time: {:?}", popstart.elapsed());
 
+        let mut handles = vec![];
+        let start = tokio::time::Instant::now();
+        for i in 0..NUM_SERVERS {
+            let map_ref = map.as_ref();
+            let handle = s.spawn(|| Runtime::new().unwrap().block_on(benchmark(map_ref)));
+            handles.push(handle);
+        }
+        
+        for handle in handles {
+            handle.join().unwrap();
+        }
+        let time = start.elapsed();
+        println!("Total Elapsed Time: {:?}", time);
+        println!("Total Throughput: {:?}", 100000000 as f64 / time.as_secs_f64());   
+        let file_name = format!(
+            "{}/DRust_home/logs/kv_single.txt", dirs::home_dir().unwrap().display()
+        );
+        let mut wrt_file = File::create(file_name).expect("file");
+        let milli_seconds = time.as_millis();
+        writeln!(wrt_file, "{}", milli_seconds as f64 / 1000.0).expect("write");
+    });
 
-    
-    let mut handles = vec![];
-    let start = tokio::time::Instant::now();
-    for i in 0..NUM_SERVERS {
-        let map_ref = map.as_dref();
-        let handle: JoinHandle<()> = dspawn_to(benchmark(map_ref), GLOBAL_HEAP_START + i * WORKER_UNIT_SIZE);
-        handles.push(handle);
-    }
-    
-    for handle in handles {
-        handle.await;
-    }
-    let time = start.elapsed();
-    println!("Total Elapsed Time: {:?}", time);
-    println!("Total Throughput: {:?}", 100000000 as f64 / time.as_secs_f64());   
-    
-    let file_name = format!(
-        "{}/DRust_home/logs/kv_drust_{}.txt", dirs::home_dir().unwrap().display(), NUM_SERVERS
-    );
-    let mut wrt_file = File::create(file_name).expect("file");
-    let milli_seconds = time.as_millis();
-    writeln!(wrt_file, "{}", milli_seconds as f64 / 1000.0).expect("write");
 }

@@ -1,23 +1,3 @@
-
-use arr_macro::arr;
-use clap::Parser;
-use crossbeam::atomic;
-use futures::{future, prelude::*, channel::oneshot::channel};
-use good_memory_allocator::SpinLockedAllocator;
-use num::integer::Roots;
-use rand::{
-    distributions::{Distribution, Uniform},
-    thread_rng,
-};
-use serde::{Deserialize, Serialize};
-use core::panic;
-use std::{sync::Mutex, intrinsics, alloc::{Allocator, Layout}, slice::SliceIndex, ptr::NonNull};
-use std::time::{Instant, SystemTime};
-use std::{fmt, sync::atomic::AtomicBool};
-use std::{io, mem, net::SocketAddr, ptr, sync::Arc, thread, time::Duration};
-use tokio::{runtime::Runtime, sync::mpsc};
-use dashmap::DashMap;
-
 use crate::drust_std::{collections::dvec::{DVec, DVecRef}, sync::dmutex::DMutex};
 
 use super::{entry::*, conf::*};
@@ -36,7 +16,7 @@ impl KVStore {
 }
 
 
-pub fn get(map: &DVecRef<'_, DMutex<GlobalEntry>>, key: usize) -> [u8; 32] {
+pub async fn get(map: &DVecRef<'_, DMutex<GlobalEntry>>, key: usize) -> [u8; 32] {
     let map_ref = map.as_ref();
     let bucket_id = bucket(key);
     let m = map_ref.get(bucket_id).unwrap();
@@ -51,7 +31,7 @@ pub async fn put(map: &DVecRef<'_, DMutex<GlobalEntry>>, key: usize, value: [u8;
     let map_ref = map.as_ref();
     let bucket_id = bucket(key);
     let m = map_ref.get(bucket_id).unwrap();
-    let value_ref = m.lock();
+    let mut value_ref = m.lock();
     value_ref.key = key;
     value_ref.value = value;
     m.unlock(value_ref);
