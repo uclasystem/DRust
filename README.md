@@ -1,11 +1,13 @@
-# DRust-DSM: an easy-to-use, efficient, and consistent distributed shared memory library
+# DRust-DSM: an easy-to-use, efficient, and consistent distributed shared memory system
 
-This repository contains a research artifact which is an easy-to-use, efficient, and consistent distributed shared memory library. With DRust-DSM you can easily distribute your single machine application to multiple servers with great performance.
+This repository contains a research artifact DRust, an efficient, consistent, and easy-to-use distributed shared memory system. With DRust, you can quickly scale your applications from a single machine to a multi-server environment without compromising performance. 
 
-**Please see [ae.md](./docs/osdi24ae-77.md) for instructions to run our tool on provided servers.**
+**Please see [AE.md](./docs/osdi24ae-77.md) for instructions to run our tool on provided servers.**
 
 
 ## 1. Environment Setup
+
+This section will help you set up the necessary environment. Before you begin, ensure you have the following prerequisites.
 
 ### 1.1 Prerequisites
 
@@ -16,7 +18,7 @@ This repository contains a research artifact which is an easy-to-use, efficient,
 
 ### 1.2 Install MLNX_OFED driver
 
-On each of your server, download and install the MLNX OFED driver for Ubuntu 18.04. DRust is tested using MLNX_OFED driver 4.9-2.2.4.0.
+DRust-DSM requires the MLNX OFED driver for Ubuntu 18.04. To install it on each server, follow these steps:
 
 ```bash
 #Download MLNX_OFED driver 4.9-2.2.4.0
@@ -69,7 +71,7 @@ Executing: /lib/systemd/systemd-sysv-install enable opensmd
 update-rc.d: error: no runlevel symlinks to modify, aborting!
 ```
 
-Please refer to the following instructions for how to solve the problem encountered when enabling opensmd.
+If you encounter errors while enabling opensmd, follow these instructions:
 
 - Update the service start level in `/etc/init.d/opensmd`. The original `/etc/init.d/opensmd` is shown below.
 
@@ -131,9 +133,9 @@ Port 1:
   Link layer: InfiniBand
 ```
 
-### 1.3 Installing Rust with rustup
+### 1.3 Installing Rust with `rustup`
 
-DRust is tested with `cargo 1.71.0-nightly`. On each server, install rustc and cargo with the following instructions.
+DRust-DSM requires a specific version of the Rust toolchain. Here's how to install it on each server:
 
 ```bash
 sudo apt remove cargo rustc
@@ -144,9 +146,9 @@ rustup toolchain install nightly-2023-04-25
 rustup default nightly-2023-04-25
 ```
 
-### 1.4 Disable ASLR
+### 1.4 Disabling ASLR
 
-To facilitate remote thread spawning, we require users to disable ASLR on each server. The following command should be executed every time the server is restarted.
+To allow remote thread spawning, disable Address Space Layout Randomization (ASLR) on each server. This command must be executed after every reboot:
 
 ```bash
 echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
@@ -154,7 +156,11 @@ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 
 ## 2. Download and Install DRust
 
-On all your servers' home directory, create a folder called `DRust_home`, and then download DRust into that directory:
+Follow these steps to download and install DRust on all your servers.
+
+### 2.1 Download DRust
+
+On each server, create a directory named `DRust_home` in the home directory and use the following command to clone the DRust repository into DRust_home:
 
 ```bash
 cd ~/
@@ -163,9 +169,9 @@ cd DRust_home
 git clone git@github.com:uclasystem/DRust.git
 ```
 
-### 2.1 Download required datasets
+### 2.2 Download required datasets
 
-Create a folder with name `dataset` in `DRust_home`. Download datasets and extract them to that folder.
+After setting up the DRust directory, inside `DRust_home`, create a `dataset` folder. Download datasets and extract them to that folder.
 
 ```bash
 cd ~/DRust_home
@@ -174,49 +180,58 @@ cd dataset
 # Put the dataset here
 ```
 
-### 2.2 Configuration
+### 2.3 Configure DRust
 
-1. Configure number of servers. Suppose you have 8 servers. 
-   - In line 27 of `comm-lib/rdma-common.h`, configure the `TOTAL_NUM_SERVERS` as 8.
-   - In line 1 of `drust/src/conf.rs`, configure the `NUM_SERVERS` as 8.
-2. Configure the size of your distributed heap. Suppose you want to allocate 16GB heap memory on each server.
-   - In line 3 of `drust/src/conf.rs`, configure the `UNIT_HEAP_SIZE_GB` as 16.
-3. In `comm-lib/rdma-server-lib.c:drust_start_server`, configure the infiniband ip address and port of your execution servers. E.g.
+Several configurations need to be adjusted based on your server setup and requirements. Follow these steps to configure DRust:
 
-    ```C
-    const char *ip_str[8] = {"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5", "10.0.0.6", "10.0.0.10", "10.0.0.11"};
-    const char *port_str[8] = {"9400", "9401", "9402", "9403", "9404", "9405", "9406", "9407"};
-    ```
+1. Set the Number of Servers
+    - In `comm-lib/rdma-common.h`, set `TOTAL_NUM_SERVERS` to the total number of servers you have.
+    - In `drust/src/conf.rs`, set `NUM_SERVERS` to the same number.
+2. Configure Distributed Heap Size
+    - In `drust/src/conf.rs`, set `UNIT_HEAP_SIZE_GB` to the desired heap size for each server (e.g., 16 for 16GB).
+3. Set InfiniBand IP Addresses and Ports
+    - In `comm-lib/rdma-server-lib.c:drust_start_server`, update `ip_str` and `port_str` arrays with your servers' IP addresses and ports. Example:
+
+      ```C
+      const char *ip_str[8] = {"10.0.0.1", "10.0.0.2", "10.0.0.3", "10.0.0.4", "10.0.0.5", "10.0.0.6", "10.0.0.10", "10.0.0.11"};
+      const char *port_str[8] = {"9400", "9401", "9402", "9403", "9404", "9405", "9406", "9407"};
+      ```
   
-4. Configure the server IP addresses. In `drust/drust.json`. Input the IP address of each server and for each server, give it three available ports. E.g.
+4. Configure Server IP Addresses in `drust.json`
+    - Modify `drust/drust.json` with each server's IP address and three available ports. Example: 
+      ```json
+      {
+        "servers": [
+          {
+            "ip": "131.xxx.xxx.201:36758",
+            "alloc_ip": "131.xxx.xxx.201:36759",
+            "safepoint_ip": "131.xxx.xxx.201:36760"
+          },
+          {
+            "ip": "131.xxx.xxx.202:36758",
+            "alloc_ip": "131.xxx.xxx.202:36759",
+            "safepoint_ip": "131.xxx.xxx.202:36760"
+          }
+        ]
+      }
+      ```
 
-    ```json
-    {
-      "servers": [
-        {
-          "ip": "131.xxx.xxx.201:36758",
-          "alloc_ip": "131.xxx.xxx.201:36759",
-          "safepoint_ip": "131.xxx.xxx.201:36760"
-        },
-        {
-          "ip": "131.xxx.xxx.202:36758",
-          "alloc_ip": "131.xxx.xxx.202:36759",
-          "safepoint_ip": "131.xxx.xxx.202:36760"
-        }
-      ]
-    }
-    ```
+### 2.4 Build DRust
 
-### 2.3 Build DRust
+To build DRust, follow these steps on each server:
 
-On each of your server, build release version of DRust using `cargo` by running 
+#### Run the Build Script
+
+You can build DRust using a script provided in the scripts directory:
 
 ```bash
 cd ~/DRust_home/DRust/scripts
 bash local_build.sh
 ```
 
-or using the following step-by-step commands:
+#### Manually Compile the Communication Library and Rust Code
+
+Alternatively, use these step-by-step commands to build DRust:
 
 ```bash
 # Compile communication static library
@@ -224,15 +239,17 @@ cd ~/DRust_home/DRust/comm-lib
 make clean
 make -j lib
 
-# Copy it drust folder
+# Copy it to the DRust folder
 cp libmyrdma.a ../drust/
 
-# Compile the rust part
+# Compile the Rust part
 cd ~/DRust_home/DRust/drust
 ~/.cargo/bin/cargo build --release
 ```
 
-Note that you may encounter the following error:
+#### Fix Build Errors with clap Dependency
+
+If you encounter errors related to the clap package, update it to a compatible version. For the following error:
 
 ```bash
 error: package `clap v4.5.4` cannot be built because it requires rustc 1.74 or newer, while the currently active rustc version is 1.71.0-nightly
@@ -241,55 +258,69 @@ cargo update -p clap@4.5.4 --precise ver
 where `ver` is the latest version of `clap` supporting rustc 1.71.0-nightly
 ```
 
-Please run the following command and then run building process again:
+Run the following command to fix it and then run building process again:
 
 ```bash
 ~/.cargo/bin/cargo update -p clap@4.5.4 --precise 4.3.0
 ~/.cargo/bin/cargo build --release
 ```
 
-Make sure that this building process runs successfully on each server.
 
-### 2.4 Deployment
+### 2.5 Deployment
 
-Copy the executable from your main server (server 0) to other servers using the following command:
+After building DRust, deploy the compiled binary to other servers:
+
+#### Copy the Executable to Other Servers
+
+From your main server (server 0), use scp to copy the drust.out executable to the same directory on other servers:
+bash
 
 ```bash
 scp ~/DRust_home/DRust/target/release/drust user@ip:DRust_home/DRust/drust.out
 ```
 
+#### Ensure Successful Deployment
+
+Verify that the executable is copied correctly to each server.
+
+
 ## 3. Running Applications
 
-We have four different example applications:
+DRust comes with four example applications:
 
 - Dataframe
 - GEMM
 - KVStore
 - SocialNet
 
-To run each application, you need to run the executable on each server through the following process:
 
-1. On all your servers except the main server(server 0), run the following command:
+### 3.1 Start the DRust Executable on All Servers Except the Main Server
 
-    ```bash
-    cd ~/DRust_home/DRust/drust
+On all servers except the main server (server 0), navigate to the DRust executable, and run the executable with the appropriate server ID and application name:
 
-    # Replace the server_id with the index for the server that is executing this executable. The main server should have 0 as its index. Suppose you have 8 servers, then the last server's index is 7.
-    # Replace the app_name with the name for the application you want to run. The example applications' names are dataframe, gemm, kv, sn.
-    # For example, ./../target/release/drust -s 7 -a dataframe
-    ./../drust.out -s server_id -a app_name
-    ```
+```bash
+cd ~/DRust_home/DRust/drust
 
-2. After starting the executable on all other servers, wait for 2 seconds, and then on your main server, run:
+# Replace the server_id with the index for the server that is executing this executable. The main server should have 0 as its index. Suppose you have 8 servers, then the last server's index is 7.
+# Replace the app_name with the name for the application you want to run. The example applications' names are dataframe, gemm, kv, sn.
+# For example, ./../target/release/drust -s 7 -a dataframe
+./../drust.out -s server_id -a app_name
+```
 
-    ```bash
-    cd ~/DRust_home/DRust/drust
+### 3.2 Start the DRust Executable on the Main Server
 
-    # Replace the app_name with the dataframe, gemm, kv, or sn.
-    ./../drust.out -s 0 -a app_name
-    ```
+After running the executable on all other servers, wait for 2 seconds, then on the main server (server 0), Start the executable with index 0 and the desired application name:
 
-## 4. Code structure
+```bash
+cd ~/DRust_home/DRust/drust
+
+# Replace the app_name with the dataframe, gemm, kv, or sn.
+./../drust.out -s 0 -a app_name
+```
+
+## 4. Code Structure
+
+The DRust codebase is organized into several directories. Here's what each directory contains:
 
 | Directory	 | Description |
 | :-----| :---- |
@@ -300,7 +331,7 @@ To run each application, you need to run the executable on each server through t
 | drust/drust_std | DRust library code |
 | scripts | Scripts to faciliate deployment of DRust |
 
-## 5. Add Your Own Application
+## 5. Adding Your Own Application
 
-Please see [library.md](./docs/library.md).
 
+To add your own application to DRust-DSM, please refer to [library.md](./docs/library.md) for detailed instructions on how to integrate your custom applications.
