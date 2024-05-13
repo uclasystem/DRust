@@ -167,7 +167,7 @@ To run Dataframe with GAM on 1 server to 8 servers, use this command:
 
 ```bash
 cd ~/DRust_home/aescripts
-bash dataframe_gam.sh 2>&1 | tee df_gam.log
+bash dataframe_gam.sh 2>&1 | tee logs/df_gam.log
 ```
 
 The results (`dataframe_gam_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
@@ -182,7 +182,7 @@ To run GEMM with GAM on 1 server to 8 servers, use this command:
 
 ```bash
 cd ~/DRust_home/aescripts
-bash gemm_gam.sh 2>&1 | tee gemm_gam.log
+bash gemm_gam.sh 2>&1 | tee logs/gemm_gam.log
 ```
 
 The results (`gemm_gam_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
@@ -197,7 +197,7 @@ To run KVStore with GAM on 1 server to 8 servers, use this command:
 
 ```bash
 cd ~/DRust_home/aescripts
-bash kv_gam.sh 2>&1 | tee kv_gam.log
+bash kv_gam.sh 2>&1 | tee logs/kv_gam.log
 ```
 
 The results (`kv_gam_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
@@ -212,7 +212,7 @@ To run SocialNet with GAM on 1 server to 8 servers, use this command:
 
 ```bash
 cd ~/DRust_home/aescripts
-bash sn_gam.sh 2>&1 | tee sn_gam.log
+bash sn_gam.sh 2>&1 | tee logs/sn_gam.log
 ```
 
 The results (`sn_gam_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
@@ -268,4 +268,94 @@ The generated plots (e.g., `dataframe_performance.pdf`) will also be located in 
 
 ```bash
 ls ~/DRust_home/aescripts/figures
+```
+
+
+
+## 6. Run Baseline System Grappa
+
+
+As requested, we also prepared scripts for Grappa. Note that Grappa's performance is much worse that DRust and the other baseline system GAM, so the following process may take over 10 hours.
+
+### Pre-Collected Performance Data
+
+We have already collected performance data for Grappa, stored in ~/DRust_home/logs/baseline. This can be used for comparison with DRust. Reviewers can also run Grappa by themselves through the following instructions.
+
+### Running All Applications on Grappa
+
+If you want to run all applications on Grappa, you can use the following all-in-one script:
+
+```bash
+# Move to the appropriate directory
+cd ~/DRust_home/aescripts
+
+# Start tmux
+tmux
+
+# Run the all-in-one script
+bash run_all_grappa.sh
+```
+
+### Running Individual Applications on GAM
+
+In addition to running all applications at once, you can run individual applications with Grappa. Follow the steps below to run each application separately:
+
+#### 3.1 Dataframe
+
+To run Dataframe with Grappa on 1 server to 8 servers, use this command:
+
+```bash
+cd ~/DRust_home/aescripts
+bash dataframe_grappa.sh 2>&1 | tee logs/df_grappa.log
+```
+
+The results (`dataframe_grappa_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
+
+```bash
+ls ~/DRust_home/logs
+```
+
+#### 3.2 GEMM
+
+To run GEMM with Grappa on 1 server to 8 servers, use this command:
+
+```bash
+cd ~/DRust_home/aescripts
+bash gemm_grappa.sh 2>&1 | tee logs/gemm_grappa.log
+```
+
+The results (`gemm_grappa_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
+
+```bash
+ls ~/DRust_home/logs
+```
+
+#### 3.3 KVStore
+
+To run KVStore with Grappa on 1 server to 8 servers, use this command:
+
+```bash
+cd ~/DRust_home/aescripts
+bash kv_grappa.sh 2>&1 | tee logs/kv_grappa.log
+```
+
+The results (`kv_grappa_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
+
+```bash
+ls ~/DRust_home/logs
+```
+
+#### 3.4 SocialNet
+
+To run SocialNet with Grappa on 1 server to 8 servers, use this command:
+
+```bash
+cd ~/DRust_home/aescripts
+bash sn_gam.sh 2>&1 | tee logs/sn_gam.log
+```
+
+The results (`sn_gam_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
+
+```bash
+ls ~/DRust_home/logs
 ```
