@@ -275,7 +275,7 @@ ls ~/DRust_home/aescripts/figures
 ## 6. Run Baseline System Grappa
 
 
-As requested, we also prepared scripts for Grappa. Note that Grappa's performance is much worse that DRust and the other baseline system GAM, so the following process may take over 10 hours.
+As requested, we also prepared scripts for Grappa. Note that Grappa's performance is much worse than DRust and the other baseline system GAM, so the following process may take hours.
 
 ### Pre-Collected Performance Data
 
@@ -300,7 +300,7 @@ bash run_all_grappa.sh
 
 In addition to running all applications at once, you can run individual applications with Grappa. Follow the steps below to run each application separately:
 
-#### 3.1 Dataframe
+#### 6.1 Dataframe
 
 To run Dataframe with Grappa on 1 server to 8 servers, use this command:
 
@@ -315,7 +315,7 @@ The results (`dataframe_grappa_8.txt`) will be stored in `~/DRust_home/logs`. Yo
 ls ~/DRust_home/logs
 ```
 
-#### 3.2 GEMM
+#### 6.2 GEMM
 
 To run GEMM with Grappa on 1 server to 8 servers, use this command:
 
@@ -330,7 +330,7 @@ The results (`gemm_grappa_8.txt`) will be stored in `~/DRust_home/logs`. You can
 ls ~/DRust_home/logs
 ```
 
-#### 3.3 KVStore
+#### 6.3 KVStore
 
 To run KVStore with Grappa on 1 server to 8 servers, use this command:
 
@@ -345,7 +345,7 @@ The results (`kv_grappa_8.txt`) will be stored in `~/DRust_home/logs`. You can v
 ls ~/DRust_home/logs
 ```
 
-#### 3.4 SocialNet
+#### 6.4 SocialNet
 
 To run SocialNet with Grappa on 1 server to 8 servers, use this command:
 
@@ -354,8 +354,39 @@ cd ~/DRust_home/aescripts
 bash sn_gam.sh 2>&1 | tee logs/sn_gam.log
 ```
 
-The results (`sn_gam_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
+The results (`sn_grappa_8.txt`) will be stored in `~/DRust_home/logs`. You can view the logs by listing the directory:
 
 ```bash
 ls ~/DRust_home/logs
+```
+
+
+### Generate Plots with Grappa
+
+To generate performance plots with Grappa, ensure no other scripts are currently running. If you have only run the DRust system, you can generate the plots using pre-computed GAM, Grappa and Non-DSM application logs with the following Python commands:
+
+```bash
+cd ~/DRust_home/aescripts
+python3 plot_with_grappa.py dataframe
+python3 plot_with_grappa.py gemm
+python3 plot_with_grappa.py kv
+python3 plot_with_grappa.py sn
+```
+
+The generated plots (e.g., `dataframe_performance_with_grappa.pdf`) will be located in `~/DRust_home/aescripts/figures`.
+
+If you have run all GAM, Grappa, and Non-DSM applications yourself and want to visualize the performance using your own time logs, use these commands to generate the plots:
+
+```bash
+cd ~/DRust_home/aescripts
+python3 plot_with_grappa.py dataframe all
+python3 plot_with_grappa.py gemm all
+python3 plot_with_grappa.py kv all
+python3 plot_with_grappa.py sn all
+```
+
+The generated plots (e.g., `dataframe_performance_with_grappa.pdf`) will also be located in `~/DRust_home/aescripts/figures`. To list them, use:
+
+```bash
+ls ~/DRust_home/aescripts/figures
 ```
