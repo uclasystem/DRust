@@ -385,10 +385,23 @@ impl<'a, T: DRust + Sized> DBox<T> {
         }
     }
 
-    pub fn get_mut_ref(&'a mut self) -> DMutRef<'a, T> {
-        DMutRef {
+    // pub fn get_mut_ref(&'a mut self) -> DMutRef<'a, T> {
+    //     DMutRef {
+    //         orig: &mut (**self.data.as_mut().unwrap()),
+    //         copy: None,
+    //     }
+    // }
+    pub fn get_mut_ref(&'a mut self) -> DMut<'a, T> {
+        if self.copy_exists {
+            self.migrate_to_local();
+        }
+        let data_addr: *const Option<Box<T, &good_memory_allocator::SpinLockedAllocator<20, 8>>> = ptr::addr_of!(self.data);
+        let combination: usize = ((unsafe{SERVER_INDEX} << 58) | (data_addr as usize));
+        DMut {
             orig: &mut (**self.data.as_mut().unwrap()),
-            copy: None,
+            copy: ptr::null_mut(),
+            owner: combination,
+            copy_exists: false,
         }
     }
 }

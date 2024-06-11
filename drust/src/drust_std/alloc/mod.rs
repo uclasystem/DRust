@@ -1,7 +1,7 @@
 use std::{
     alloc::{Allocator, Layout},
     net::SocketAddr,
-    ptr::NonNull,
+    ptr::{self, NonNull},
     sync::{Arc, Once},
 };
 
@@ -36,6 +36,7 @@ pub trait DAllocator {
     async fn rdrop(addr: usize, type_id: usize);
     async fn get_allocator() -> usize;
     async fn rdrop_vec(addr: usize, capacity: usize, len: usize, type_id: usize);
+    async fn rupdate(owner_addr: usize, data_addr: usize);
 }
 
 #[derive(Clone)]
@@ -91,6 +92,13 @@ impl DAllocator for DAllocServer {
     ) {
         dprintln!("drop vec addr: {}, type_id: {}", addr, type_id);
         drop_vec_with_id(type_id as u32, addr, capacity, len);
+    }
+
+    async fn rupdate(self, _: context::Context, owner_addr: usize, data_addr: usize) {
+        unsafe {
+            let new_box = Some(Box::from_raw_in(data_addr as *mut u8, &LOCAL_ALLOCATOR,));
+            ptr::write_volatile(owner_addr as *mut Option<Box<u8, &good_memory_allocator::SpinLockedAllocator<20, 8>>>, new_box);
+        }
     }
 }
 
@@ -173,6 +181,18 @@ pub fn ddrop_vec(ptr: NonNull<u8>, type_id: usize, capacity: usize, len: usize, 
     // std::thread::spawn(move || {
     //     Runtime::new().unwrap().block_on(client.rdrop_vec(context::current(), ptr_raw, capacity, len, type_id))
     // });
+}
+
+pub fn dupdate(owner_addr: usize, data_addr: usize, server_idx: usize) {
+    let client = Arc::clone(&unsafe { DALLOCTOR.as_ref().unwrap() }[server_idx]);
+    let owner_addr = owner_addr as usize;
+    let data_addr = data_addr as usize;
+    tokio::spawn(async move {
+        client
+            .rupdate(context::current(), owner_addr, data_addr)
+            .await
+            .unwrap();
+    });
 }
 
 pub fn init_heap(server_addr: SocketAddr) {
