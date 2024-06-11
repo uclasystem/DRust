@@ -107,12 +107,12 @@ impl<'a, T: DRust + Sized> TBox<T> {
         }
     }
 
-    pub fn get_mut_ref(&'a mut self) -> DMutRef<'a, T> {
-        DMutRef {
-            orig: &mut (**self.data.as_mut().unwrap()),
-            copy: None,
-        }
-    }
+    // pub fn get_mut_ref(&'a mut self) -> DMutRef<'a, T> {
+    //     DMutRef {
+    //         orig: &mut (**self.data.as_mut().unwrap()),
+    //         copy: None,
+    //     }
+    // }
 }
 
 // TODO!(add a way to also copy tbox values to local when deref dmutref)
