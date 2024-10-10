@@ -6,3 +6,5 @@ members = [
   "applications/kv",
   "drust",
 ]
+
+exclude = ["transform/gemm"]

@@ -240,7 +240,7 @@ make clean
 make -j lib
 
 # Copy it to the DRust folder
-cp libmyrdma.a ../drust/
+cp libmyrdma.a ../
 
 # Compile the Rust part
 cd ~/DRust_home/DRust/drust

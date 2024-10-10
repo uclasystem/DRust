@@ -10,6 +10,7 @@ pub mod utils;
 use std::sync::Arc;
 use std::{net::SocketAddr, time::Duration};
 
+use crate::transformed;
 use crate::{
     app,
     conf::*,
@@ -89,6 +90,8 @@ pub async fn drust_main(
             app::kv::run().await;
         } else if app == "sn" {
             app::socialnet::run().await;
+        } else if app == "orig_gemm" {
+            transformed::gemm::run().await;
         } else {
             panic!("unknown app");
         }
